@@ -61,12 +61,12 @@ async fn main() -> anyhow::Result<()> {
                                 &(),
                             )
                             .await.unwrap();
-                            Ok::<_, gel_tokio::Error>(())
+                            Ok(())
                         })
                         .await?;
 
                     println!("[tx] closure returning Ok");
-                    Ok::<_, gel_tokio::Error>(())
+                    Ok(())
                 }
             }
         })
@@ -75,18 +75,14 @@ async fn main() -> anyhow::Result<()> {
     let n = attempts.load(Ordering::SeqCst);
     println!();
     println!("=== summary ===");
-    println!("[main] transaction result: {result:?}");
-    println!("[main] closure invocations: {n}");
+    println!("transaction returned: {result:?}");
+    println!("closure invocations: {n}");
 
     if let Err(e) = &result {
         let retryable = e.has_tag(SHOULD_RETRY);
-        println!("[main] surfaced error has_tag(SHOULD_RETRY) = {retryable}");
+        println!("e.has_tag(SHOULD_RETRY) = {retryable}");
         if retryable && n == 1 {
-            println!(
-                "BUG CONFIRMED: closure invoked exactly once, but the surfaced \
-                 error is SHOULD_RETRY-tagged. gel-tokio's commit path did not \
-                 consult the retry rule."
-            );
+            println!("BUG CONFIRMED");
         }
     }
 
