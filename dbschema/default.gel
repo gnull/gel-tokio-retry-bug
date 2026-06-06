@@ -1,0 +1,6 @@
+module default {
+    type Cell {
+        required name: str { constraint exclusive };
+        required color: str;
+    }
+}
